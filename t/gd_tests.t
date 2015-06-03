@@ -9,30 +9,12 @@
 
 use strict;
 use PDL;
-use PDL::Config;
+use PDL::IO::GD;
 use Test::More;
+use ExtUtils::testlib;
 use File::Temp qw(tempdir);
 
-BEGIN
-{
-    use PDL::Config;
-    if ( $PDL::Config{WITH_GD} ) 
-    {
-        eval( " use PDL::IO::GD; " );
-        if( $@ )
-        {
-            plan skip_all => "PDL::IO::GD requires the gd image library.";
-        }  
-        else
-        {
-            plan tests => 13;
-        }
-    }
-    else
-    {
-        plan skip_all => "PDL::IO::GD not compiled.";
-    }
-}
+plan tests => 13;
 
 sub tapprox
 {
@@ -42,10 +24,6 @@ sub tapprox
     #ok( all($d < 1.0e-5) );
     return all($d < 1.0e-5);
 }
-
-use ExtUtils::testlib;
-
-use PDL::IO::GD;
 
 # Test Files:
 my $tempdir = tempdir( CLEANUP=>1 );
@@ -394,4 +372,3 @@ sub write_lut
 ENDLUT
     close( LUT );
 } # End of write_lut()...
-

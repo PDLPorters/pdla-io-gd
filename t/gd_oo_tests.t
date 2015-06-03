@@ -1,57 +1,18 @@
 #!/usr/bin/perl
 
-#
 # Tests for the OO interface of PDL::IO::GD.
 #
 # Judd Taylor, Orbital Sytstems, Ltd.
 # 07 Apr 2006
-#
 
 use strict;
 use PDL;
+use PDL::IO::GD;
+use ExtUtils::testlib;
 use Test::More;
 use File::Temp qw(tempdir);
 
-BEGIN
-{
-    my $Ntests = 32;
-
-    use PDL::Config;
-    if ( $PDL::Config{WITH_GD} ) 
-    {
-        eval( " use PDL::IO::GD; " );
-        if( $@ )
-        {
-            plan skip_all => "PDL::IO::GD requires the gd image library.";
-        }  
-#        elsif( $^O =~ /bsd$/i or $^O =~ /dragonfly/i )
-#        {
-#           if ( $ENV{AUTOMATED_TESTING} )
-#           {
-#              plan skip_all => "Known problem: sf.net bug #3518190, t/gd_oo_tests.t fails for BSD AMD64";
-#           }
-#           else
-#           {
-#              diag "Known problem: sf.net bug #3518190, t/gd_oo_tests.t fails for BSD AMD64";
-#              plan tests => $Ntests;
-#           }
-#        }  
-        else
-        {
-            plan tests => $Ntests;
-        }
-    }
-    else
-    {
-        plan skip_all => "PDL::IO::GD not compiled.";
-    }
-}
-
-use ExtUtils::testlib;
-
-use PDL::IO::GD;
-use PDL::Config;
-
+plan tests => 32;
 
 sub tapprox
 {
@@ -544,4 +505,3 @@ sub write_lut
 ENDLUT
     close( LUT );
 } # End of write_lut()...
-
