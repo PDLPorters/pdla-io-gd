@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use PDL::Core::Dev;
+use PDL::Config;
 use ExtUtils::MakeMaker;
 use Config;
 
@@ -7,11 +9,13 @@ my ($include_path, $lib_path, $linkname);
 my $ppfile = "GD.pd";
 my $package_name = "PDL::IO::GD";
 my $lib_name = "GD";
-my @find_libs = ( 'libgd.so', 'libgd.a', 'libgd.dll.a', 'bgd.dll' );
-my @find_incs = ( 'gd.h' );
 my $config_flag = 'WITH_GD';
 my $config_libs = 'GD_LIBS';
 my $config_incs = 'GD_INC';
+
+# here starteth the code for basic Alien::GD
+my @find_libs = ( 'libgd.so', 'libgd.a', 'libgd.dll.a', 'bgd.dll' );
+my @find_incs = ( 'gd.h' );
 my @lib_locations = (
     '/usr/lib64',
     '/usr/local/lib64',
@@ -27,32 +31,13 @@ my @inc_locations = (
     $Config{usrinc},
 );
 
-my $msg = "";
-my $forcebuild=0;
-
-if (defined $PDL::Config{$config_flag} && $PDL::Config{$config_flag}==0)
-{
-    $msg = "\n   Will skip build of $package_name on this system   \n";
-    goto skip;
-}
-
-if (defined $PDL::Config{$config_flag} && $PDL::Config{$config_flag}==1)
-{
-    print "\n   Will forcibly try and build $package_name on this system   \n\n";
-    $forcebuild=1;
-}
-
 # Look for GD includes/libs
-
 # get locations from perldl.conf, if specified there:
 @lib_locations = @{$PDL::Config{$config_libs}}
     if( defined $PDL::Config{$config_libs} );
 @inc_locations = @{$PDL::Config{$config_incs}}
     if( defined $PDL::Config{$config_incs} );
 
-#
-# Do the search:
-#
 # Look for the libs:
 foreach my $libdir ( @lib_locations ) {
     my $found = 0;
@@ -69,8 +54,8 @@ foreach my $libdir ( @lib_locations ) {
 } # foreach $libdir...
 
 unless( defined( $lib_path ) ) {
-    $msg .= "Cannot find $lib_name library, (@find_libs).\n"
-          . "Please add the correct library path to Makefile.PL or install $lib_name\n.";
+    # Cannot find $lib_name library, (@find_libs).
+    # Please add the correct library path to Makefile.PL or install $lib_name
 }
 
 # Look for the include files:
@@ -82,42 +67,14 @@ foreach my $incdir ( @inc_locations ) {
         }
     }
 }
+# here endeth the code for Alien::GD
 
 unless( defined( $include_path ) ) {
-    $msg .= "Cannot find $lib_name header files, (@find_incs).\n"
-          . "Please add the correct library path to Makefile.PL or install $lib_name.\n";
+  die <<EOF;
+Cannot find $lib_name header files, (@find_incs).
+Please add the correct library path to Makefile.PL or install $lib_name.
+EOF
 }
-
-#
-# Make sure everything we wanted is found:
-#
-my $donot = 1;
-if( defined( $include_path ) && defined( $lib_path ) ) {
-    $donot = 0;
-}
-
-$donot = 0 if( $forcebuild );
-
-if ( $donot )
-{
-    $msg .= "\n Skipping build of $package_name.\n";
-}
-
-skip:
-
-if ($msg ne "" && $forcebuild==0)
-{
-    write_dummy_make( $msg );
-    $donot = 1;
-    $PDL::Config{$config_flag}=0;
-}
-else
-{
-    $PDL::Config{$config_flag}=1;
-    print "\n   Building $package_name. Turn off $config_flag if there are any problems\n\n";
-}
-
-return if $donot;
 
 my $package = [$ppfile, $lib_name, $package_name];
 my %hash = pdlpp_stdargs($package);
@@ -125,9 +82,15 @@ $hash{VERSION_FROM} = $ppfile;
 $hash{DEFINE} = $PDL::Config{GD_DEFINE};
 $hash{LIBS} = ["-L$lib_path -l$linkname"];
 $hash{INC} = PDL_INCLUDE() . " -I$include_path";
-push( @{ $hash{TYPEMAPS} }, 'typemap' );
+push @{ $hash{TYPEMAPS} }, 'typemap';
+for my $key (qw(BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES PREREQ_PM)) {
+  $hash{$key}{'PDL::Core'} = 0;
+}
+for my $key (qw(TEST_REQUIRES PREREQ_PM)) {
+  $hash{$key}{'List::MoreUtils'} = 0;
+}
 
 undef &MY::postamble; # suppress warning
-*MY::postamble = sub { pdlpp_postamble_int( $package ); };
+*MY::postamble = sub { pdlpp_postamble( $package ); };
 
 WriteMakefile(%hash);
