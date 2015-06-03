@@ -15,4 +15,5 @@ PDL::IO::GD Changes:
     - Transferred to new name PDL::IO::GD, and modified for inclusion to the 
         PDL CVS tree.
 
-
+2.20: 3 Jun 2015 (Ed J)
+    - Moved into own repo and CPAN distro
