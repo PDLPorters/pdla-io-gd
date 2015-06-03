@@ -1,0 +1,7 @@
+#!include_default
+MANIFEST.SKIP
+GD.bs
+GD.c
+GD.o
+GD.pm
+GD.xs
