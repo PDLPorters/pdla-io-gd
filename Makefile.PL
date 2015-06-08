@@ -89,6 +89,16 @@ for my $key (qw(BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES PREREQ_PM)) {
 for my $key (qw(TEST_REQUIRES PREREQ_PM)) {
   $hash{$key}{'List::MoreUtils'} = 0;
 }
+$hash{META_MERGE} = {
+  "meta-spec" => { version => 2 },
+  resources => {
+    repository => {
+      type => 'git',
+      url => 'git://github.com/PDLPorters/pdl-io-gd',
+      web => 'https://github.com/PDLPorters/pdl-io-gd',
+    },
+  },
+};
 
 undef &MY::postamble; # suppress warning
 *MY::postamble = sub { pdlpp_postamble( $package ); };
