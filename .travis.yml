@@ -1,5 +1,10 @@
 language: perl
-sudo: true
+sudo: false
+addons:
+  apt:
+    packages:
+    - build-essential
+    - libgd2-xpm-dev
 matrix:
   include:
     # start the first coverage early so that it starts before everything else
@@ -10,10 +15,6 @@ matrix:
     - perl: "5.20"
       env: TEST_INSTALLED=1 # test not from blib but after installing
     - perl: "5.10"
-    - perl: "5.12"
-    - perl: "5.14"
-    - perl: "5.16"
-    - perl: "5.18"
     - perl: "blead"
     # this is commented out because we test Perl v5.20 under all BADVAL configurations including the default below
     #- perl: "5.20"
@@ -32,8 +33,6 @@ matrix:
   allow_failures:
     - perl: blead
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install libgd2-xpm-dev
   # clang is already installed in Travis-CI environment. Using PERL_MM_OPT does not work with subdirectory Makefile.PLs so we override Config.pm
   # Also, both $Config{cc} and $Config{ld} need to be set because under ELF environments (such as Travis-CI's Ubuntu), this is what Perl's Config.pm does.
   - if [ "$CC" == "clang" ]; then mkdir build_aux; echo 'package force_clang; use ExtUtils::MakeMaker::Config; $Config{cc} = $Config{ld} = "clang"; 1' > build_aux/force_clang.pm; export PERL5OPT="-I$(pwd)/build_aux -Mforce_clang"; fi
@@ -41,7 +40,6 @@ before_install:
   - perl -pi -e 's|BADVAL_USENAN => 0|BADVAL_USENAN => 1|   if defined $ENV{PDL_BADVAL_USENAN}  && $ENV{PDL_BADVAL_USENAN}   == 1' perldl.conf # enable BADVAL_USENAN
   - perl -pi -e 's|BADVAL_PER_PDL => 0|BADVAL_PER_PDL => 1| if defined $ENV{PDL_BADVAL_PER_PDL} && $ENV{PDL_BADVAL_PER_PDL}  == 1' perldl.conf # enable BADVAL_PER_PDL
   - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
-  - ls -lR
   - export SPLIT_BUILD=0
   - source ~/travis-perl-helpers/init
   - build-perl
