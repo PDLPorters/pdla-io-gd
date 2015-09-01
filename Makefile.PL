@@ -85,6 +85,7 @@ $hash{INC} = PDLA_INCLUDE() . " -I$include_path";
 push @{ $hash{TYPEMAPS} }, 'typemap';
 for my $key (qw(BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES PREREQ_PM)) {
   $hash{$key}{'PDLA::Core'} = 0;
+  $hash{$key}{'PDLA::IO::Misc'} = 0;
 }
 for my $key (qw(TEST_REQUIRES PREREQ_PM)) {
   $hash{$key}{'List::MoreUtils'} = 0;
