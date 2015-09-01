@@ -1,15 +1,15 @@
 #!/usr/bin/perl
 
 #
-# t/gd_tests.t - tests functions in the PDL::IO::GD module
+# t/gd_tests.t - tests functions in the PDLA::IO::GD module
 #
 # Judd Taylor, USF IMaRS
 # 13 March 2003
 #
 
 use strict;
-use PDL;
-use PDL::IO::GD;
+use PDLA;
+use PDLA::IO::GD;
 use Test::More;
 use ExtUtils::testlib;
 use File::Temp qw(tempdir);

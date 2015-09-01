@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-use PDL::Core::Dev;
-use PDL::Config;
+use PDLA::Core::Dev;
+use PDLA::Config;
 use ExtUtils::MakeMaker;
 use Config;
 
 my ($include_path, $lib_path, $linkname);
 my $ppfile = "GD.pd";
-my $package_name = "PDL::IO::GD";
+my $package_name = "PDLA::IO::GD";
 my $lib_name = "GD";
 my $config_flag = 'WITH_GD';
 my $config_libs = 'GD_LIBS';
@@ -33,10 +33,10 @@ my @inc_locations = (
 
 # Look for GD includes/libs
 # get locations from perldl.conf, if specified there:
-@lib_locations = @{$PDL::Config{$config_libs}}
-    if( defined $PDL::Config{$config_libs} );
-@inc_locations = @{$PDL::Config{$config_incs}}
-    if( defined $PDL::Config{$config_incs} );
+@lib_locations = @{$PDLA::Config{$config_libs}}
+    if( defined $PDLA::Config{$config_libs} );
+@inc_locations = @{$PDLA::Config{$config_incs}}
+    if( defined $PDLA::Config{$config_incs} );
 
 # Look for the libs:
 foreach my $libdir ( @lib_locations ) {
@@ -79,12 +79,12 @@ EOF
 my $package = [$ppfile, $lib_name, $package_name];
 my %hash = pdlpp_stdargs($package);
 $hash{VERSION_FROM} = $ppfile;
-$hash{DEFINE} = $PDL::Config{GD_DEFINE};
+$hash{DEFINE} = $PDLA::Config{GD_DEFINE};
 $hash{LIBS} = ["-L$lib_path -l$linkname"];
-$hash{INC} = PDL_INCLUDE() . " -I$include_path";
+$hash{INC} = PDLA_INCLUDE() . " -I$include_path";
 push @{ $hash{TYPEMAPS} }, 'typemap';
 for my $key (qw(BUILD_REQUIRES CONFIGURE_REQUIRES TEST_REQUIRES PREREQ_PM)) {
-  $hash{$key}{'PDL::Core'} = 0;
+  $hash{$key}{'PDLA::Core'} = 0;
 }
 for my $key (qw(TEST_REQUIRES PREREQ_PM)) {
   $hash{$key}{'List::MoreUtils'} = 0;
@@ -94,8 +94,8 @@ $hash{META_MERGE} = {
   resources => {
     repository => {
       type => 'git',
-      url => 'git://github.com/PDLPorters/pdl-io-gd',
-      web => 'https://github.com/PDLPorters/pdl-io-gd',
+      url => 'git://github.com/PDLPorters/pdla-io-gd',
+      web => 'https://github.com/PDLPorters/pdla-io-gd',
     },
   },
 };
