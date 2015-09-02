@@ -48,6 +48,7 @@ before_script:
 script:
   - export PROVE_FLAG=""; if [ "$TEST_INSTALLED" == 1 ]; then make install clean; else PROVE_FLAG="-b -v"; fi # clean is to ensure no blib
   - if [ "$SERIAL_TESTING" == 1 ]; then prove $PROVE_FLAG $(test-files); else prove --formatter TAP::Formatter::File -j$(test-jobs) $PROVE_FLAG $(test-files); fi
+  - export PDLDOC_FUNCTION="write_png"; export PAGER="cat"; perl -MPDL::Doc::Perldl -e 'PDL::Doc::Perldl::finddoc($ARGV[0])' "$PDLDOC_FUNCTION" | perl -pe '$r++ if /^No PDL docs/; END { exit $r }'
 after_success:
   - coverage-report
 branches:
